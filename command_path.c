@@ -1,56 +1,51 @@
 #include "shell.h"
 
+/**
+ * command_path - Finds the full path of a command
+ * @cmd: The command to find
+ * Return: The full path of the command
+ */
+
 char *command_path(char *cmd)
 {
-    char *token, *path_copy, *path, *full_path;
-    struct stat buf;
-    
-    path = _getenv("PATH");
+	char *path, *path_copy, *full_path, *token;
+	struct stat buf;
 
-    if (path == NULL)
-    {
-        fprintf(stderr, "PATH variable not found in the environment.\n");
-        return NULL;
-    }
-
-    path_copy = strdup(path);
-    if (path_copy == NULL)
-    {
-        perror("Error duplicating PATH");
-        return NULL;
-    }
-
-    token = strtok(path_copy, ":");
-    while (token != NULL)
-    {
-        full_path = malloc(strlen(token) + strlen(cmd) + 2); 
-        if (full_path == NULL)
-        {
-            perror("Error allocating memory for full path");
-            free(path_copy);
-            return NULL;
-        }
-
-        strcpy(full_path, token);
-        strcat(full_path, "/");
-        strcat(full_path, cmd);
-
-        if (stat(full_path, &buf) == 0)
-        {
-            free(path_copy);
-            return full_path;
-        }
-
-        free(full_path);
-        token = strtok(NULL, ":");
-    }
-
-    if (stat(cmd, &buf) == 0)
-    {
-        free(path_copy);
-        return strdup(cmd);
-    }
-
-    free(path_copy);
-    return NULL;
+	path = _getenv("PATH");
+	if (path == NULL)
+	{
+		fprintf(stderr, "Path variable not found");
+		return (NULL);
+	}
+	path_copy = strdup(path);
+	if (path_copy == NULL)
+	{
+		fprintf(stderr, "Error copying path");
+		return (NULL);
+	}
+	token = strtok(path_copy, ":");
+	while (token != NULL)
+	{
+		full_path = malloc(strlen(token) + strlen(cmd) + 2);
+		if (full_path == NULL)
+		{
+			fprintf(stderr, "Error allocating full path");
+			free(path_copy);
+			return (NULL);
+		}
+		strcpy(full_path, token);
+		strcat(full_path, "/");
+		strcat(full_path, cmd);
+		if (stat(full_path, &buf) == 0)
+		{
+			free(path_copy);
+			return (full_path);
+		}
+		free(full_path);
+		token = strtok(NULL, ":");
+	}
+	free(path_copy);
+	if (stat(cmd, &buf) == 0)
+		return (strdup(cmd));
+	return (NULL);
 }
